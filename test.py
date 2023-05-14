@@ -1,11 +1,10 @@
 import unittest
+
 from bs4 import BeautifulSoup
-from main import (app,
-                  trademark_words,
+
+from main import (ROOT_PATH, URL, app, change_img_links_to_proxy,
                   change_style_links_to_absolute,
-                  change_img_links_to_proxy,
-                  replace_source_links_with_proxy,
-                  URL, ROOT_PATH)
+                  replace_source_links_with_proxy, trademark_words)
 
 
 class TestProxy(unittest.TestCase):

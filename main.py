@@ -1,7 +1,9 @@
-from flask import Flask, request, Response
-from bs4 import BeautifulSoup
-import requests
 import re
+
+import cachetools.func
+import requests
+from bs4 import BeautifulSoup
+from flask import Flask, Response, request
 
 app = Flask(__name__)
 
@@ -13,6 +15,7 @@ ROOT_PATH = '/'
 
 @app.route(ROOT_PATH, defaults={'path': ''})
 @app.route('/<path:path>')
+@cachetools.func.ttl_cache(maxsize=128, ttl=10)
 def proxy(path):
     """Main proxy view function"""
     url = '{}/{}'.format(URL, path)
