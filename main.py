@@ -1,6 +1,6 @@
 import re
+from functools import wraps
 
-import cachetools.func
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, Response, request
@@ -13,20 +13,50 @@ REPLACEMENT = r'\g<0>™'
 ROOT_PATH = '/'
 
 
-@app.route(ROOT_PATH, defaults={'path': ''})
-@app.route('/<path:path>')
-@cachetools.func.ttl_cache(maxsize=128, ttl=10)
+def modify_response(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        html = response.get('html')
+        if isinstance(html, str):
+            modified_html = modify_html_page(html)
+            response['html'] = modified_html
+        return response
+
+    def modify_html_page(html):
+        """
+        Modify page by adding trademarks,
+        changing stylesheet links and hrefs
+        """
+        soup = BeautifulSoup(html, 'html.parser')
+        trademark_words(soup)
+        change_style_links_to_absolute(soup)
+        replace_source_links_with_proxy(soup)
+        change_img_links_to_proxy(soup)
+        return soup
+
+    return wrapper
+
+
+@modify_response
+def fetch_url(url):
+    response = requests.request(request.method, url,
+                                params=request.args,
+                                data=request.form.to_dict())
+    return {'html': response.text,
+            'status:': response.status_code,
+            'headers': response.headers}
+
+
+@app.route(ROOT_PATH, defaults={'path': ''}, )
+@app.route('/<path:path>', methods=['GET', 'POST'])
 def proxy(path):
     """Main proxy view function"""
     url = '{}/{}'.format(URL, path)
-    params = request.args
-    response = requests.get(url, params)
-    html = response.text
-    modified_html = modify_html_page(html)
-    headers = {'Access-Control-Allow-Origin': '*'}
-    return Response(str(modified_html),
-                    content_type=response.headers['content-type'],
-                    headers=headers)
+    response = fetch_url(url)
+    return Response(str(response.get('html')),
+                    content_type=response.get('headers').get(
+                        'content-type'))
 
 
 def trademark_words(soup):
@@ -57,19 +87,6 @@ def change_img_links_to_proxy(soup):
     for img in soup.find_all('img'):
         if 'src' in img.attrs and not img.attrs['src'].startswith('http'):
             img.attrs['src'] = '{}/{}'.format(URL, img.attrs['src'])
-
-
-def modify_html_page(html):
-    """
-    Modify page by adding trademarks,
-    changing stylesheet links and hrefs
-    """
-    soup = BeautifulSoup(html, 'html.parser')
-    trademark_words(soup)
-    change_style_links_to_absolute(soup)
-    replace_source_links_with_proxy(soup)
-    change_img_links_to_proxy(soup)
-    return soup
 
 
 if __name__ == '__main__':
