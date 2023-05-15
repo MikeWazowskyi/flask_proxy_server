@@ -1,5 +1,5 @@
 # flask_proxy_server
-
+[![python-app workflow](https://github.com/MikeWazowskyi/flask_proxy_server/actions/workflows/python-app.yml/badge.svg)](https://github.com/MikeWazowskyi/flask_proxy_server/actions/workflows/python-app.yml)
 ## Description
 
 #### Implementation of a simple HTTP proxy server that runs locally and displays the content of Hacker News pages. The proxy modifies the text on the pages as follows: after every six-letter word, there is a trademark symbol "™".
