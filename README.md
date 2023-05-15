@@ -24,5 +24,6 @@
 
     ``` python -m pip install -r requirements.txt```
 
-4. Run main.py
-     ``` python main.py```
+4. Run main.py:
+
+    ``` python main.py```
