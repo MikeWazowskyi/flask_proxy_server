@@ -14,6 +14,10 @@ class TestProxy(unittest.TestCase):
     def test_index(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
+        response = self.app.post('/login')
+        self.assertEqual(response.status_code, 200)
+        response = self.app.post('/submit')
+        self.assertEqual(response.status_code, 200)
 
     def test_trademark_words(self):
         html = '<html><body><p>This is native</p></body></html>'
