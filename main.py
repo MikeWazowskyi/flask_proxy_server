@@ -11,6 +11,7 @@ URL = 'https://news.ycombinator.com'
 PATTERN = r'\b\w{6}\b'
 REPLACEMENT = r'\g<0>™'
 ROOT_PATH = '/'
+PORT = 8232
 
 
 def modify_response(func):
@@ -90,4 +91,4 @@ def change_img_links_to_proxy(soup):
 
 
 if __name__ == '__main__':
-    app.run(port=8232)
+    app.run(port=PORT)
