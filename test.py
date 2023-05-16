@@ -2,7 +2,8 @@ import unittest
 
 from bs4 import BeautifulSoup
 
-from main import (ROOT_PATH, URL, app, change_img_links_to_proxy,
+from main import (ROOT_PATH, URL, STATIC_FOLDER, app,
+                  change_img_links_to_proxy,
                   change_style_links_to_absolute,
                   replace_source_links_with_proxy, trademark_words)
 
@@ -20,8 +21,9 @@ class TestProxy(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_trademark_words(self):
-        html = '<html><body><p>This is native</p></body></html>'
-        expected_html = '<html><body><p>This is native™</p></body></html>'
+        html = '<html><body><p>This is native Python™</p></body></html>'
+        expected_html = ('<html><body><p>This is native™ Python™'
+                         '</p></body></html>')
         soup = BeautifulSoup(html, 'html.parser')
         trademark_words(soup)
         self.assertEqual(str(soup), expected_html)
@@ -29,8 +31,9 @@ class TestProxy(unittest.TestCase):
     def test_change_style_links_to_absolute(self):
         html = ('<html><head><link rel="stylesheet" '
                 'href="/style.css"></head></html>')
-        expected_html = (f'<html><head><link href="{URL}//style.css" '
-                         f'rel="stylesheet"/></head></html>')
+        expected_html = (
+            f'<html><head><link href="{STATIC_FOLDER}/style.css" '
+            f'rel="stylesheet"/></head></html>')
         soup = BeautifulSoup(html, 'html.parser')
         change_style_links_to_absolute(soup)
         self.assertEqual(str(soup), expected_html)
@@ -45,8 +48,8 @@ class TestProxy(unittest.TestCase):
 
     def test_change_img_links_to_proxy(self):
         html = '<html><body><img src="/image.jpg"></body></html>'
-        expected_html = (f'<html><body><img src="{URL}'
-                         f'//image.jpg"/></body></html>')
+        expected_html = (f'<html><body><img src="{STATIC_FOLDER}'
+                         f'/image.jpg"/></body></html>')
         soup = BeautifulSoup(html, 'html.parser')
         change_img_links_to_proxy(soup)
         self.assertEqual(str(soup), expected_html)
