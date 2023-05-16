@@ -8,10 +8,11 @@ from flask import Flask, Response, request
 app = Flask(__name__)
 
 URL = 'https://news.ycombinator.com'
-PATTERN = r'\b\w{6}\b'
+PATTERN = r'\b\w{6}(?!™)\b'
 REPLACEMENT = r'\g<0>™'
 ROOT_PATH = '/'
 PORT = 8232
+STATIC_FOLDER = '/static/'
 
 
 def modify_response(func):
@@ -34,6 +35,7 @@ def modify_response(func):
         change_style_links_to_absolute(soup)
         replace_source_links_with_proxy(soup)
         change_img_links_to_proxy(soup)
+        change_links_to_script(soup)
         return soup
 
     return wrapper
@@ -45,7 +47,7 @@ def fetch_url(url):
                                 params=request.args,
                                 data=request.form.to_dict())
     return {'html': response.text,
-            'status:': response.status_code,
+            'status': response.status_code,
             'headers': response.headers}
 
 
@@ -57,7 +59,7 @@ def proxy(path):
     response = fetch_url(url)
     return Response(str(response.get('html')),
                     content_type=response.get('headers').get(
-                        'content-type'))
+                        'content-type'), status=response.get('status'))
 
 
 def trademark_words(soup):
@@ -71,7 +73,11 @@ def change_style_links_to_absolute(soup):
     """Changes href in links with absolute links"""
     for link in soup.find_all('link'):
         if 'href' in link.attrs:
-            link.attrs['href'] = '{}/{}'.format(URL, link.attrs['href'])
+            match = re.search(r'^([^?]+)', link.attrs['href'])
+            if match:
+                link.attrs['href'] = STATIC_FOLDER + match.group(1)
+            else:
+                link.attrs['href'] = STATIC_FOLDER + link.attrs['href']
 
 
 def replace_source_links_with_proxy(soup, path=None):
@@ -86,8 +92,19 @@ def replace_source_links_with_proxy(soup, path=None):
 def change_img_links_to_proxy(soup):
     """Changes href in img with absolute links"""
     for img in soup.find_all('img'):
-        if 'src' in img.attrs and not img.attrs['src'].startswith('http'):
-            img.attrs['src'] = '{}/{}'.format(URL, img.attrs['src'])
+        if 'src' in img.attrs:
+            img.attrs['src'] = STATIC_FOLDER + img.attrs['src']
+
+
+def change_links_to_script(soup):
+    """Changes href in img with absolute links"""
+    for script in soup.find_all('script'):
+        if 'src' in script.attrs:
+            match = re.search(r'^([^?]+)', script.attrs['src'])
+            if match:
+                script.attrs['src'] = STATIC_FOLDER + match.group(1)
+            else:
+                script.attrs['src'] = STATIC_FOLDER + script.attrs['src']
 
 
 if __name__ == '__main__':
