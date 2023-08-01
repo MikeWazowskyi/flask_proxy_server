@@ -24,6 +24,6 @@
 
     ``` python -m pip install -r requirements.txt```
 
-4. Run main.py:
+4. Run:
 
-    ``` python main.py```
+    ``` flask run```
