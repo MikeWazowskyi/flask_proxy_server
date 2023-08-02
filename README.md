@@ -1,4 +1,5 @@
-# flask_proxy_server
+# Proxy server on Flask
+
 [![python-app workflow](https://github.com/MikeWazowskyi/flask_proxy_server/actions/workflows/python-app.yml/badge.svg)](https://github.com/MikeWazowskyi/flask_proxy_server/actions/workflows/python-app.yml)
 ## Description
 
@@ -24,6 +25,6 @@
 
     ``` python -m pip install -r requirements.txt```
 
-4. Run main.py:
+4. Run:
 
-    ``` python main.py```
+    ``` flask run```
