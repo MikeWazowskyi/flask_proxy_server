@@ -18,7 +18,11 @@
 
     ```python -m venv venv```
 
-    ```source vens/Scripts/activate```
+   *unix/MacOS:
+   ``` source venv/bin/activate```
+
+   Windows:
+   ``` ./venv/Scripts/activate```
 
 3. Install requirements:
 
@@ -29,3 +33,7 @@
 4. Run:
 
     ``` flask run```
+   
+## About Author:
+https://github.com/MikeWazowskyi
+
