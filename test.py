@@ -2,10 +2,11 @@ import unittest
 
 from bs4 import BeautifulSoup
 
-from main import (ROOT_PATH, URL, STATIC_FOLDER, app,
+from main import (ROOT_PATH, STATIC_FOLDER, URL, app,
                   change_img_links_to_proxy,
                   change_style_links_to_absolute,
-                  replace_source_links_with_proxy, trademark_words)
+                  replace_source_links_with_proxy,
+                  trademark_words)
 
 
 class TestProxy(unittest.TestCase):
