@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 
@@ -13,7 +14,13 @@ class TestProxy(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
 
-    def test_index(self):
+    @patch('main.fetch_url')
+    def test_index(self, mock_get):
+        mock_get.return_value = {
+            'html': '<h1>Hello, World!</h1>',
+            'status': 200,
+            'headers': {'Content-Type': 'text/html; charset=utf-8'}
+        }
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
         response = self.app.post('/login')
